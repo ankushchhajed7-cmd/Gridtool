@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+<meta name="theme-color" content="#0E0D0B" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<title>XAUUSD Grid DD</title>
+<style>
+  :root{
+    --bg:#0E0D0B; --panel:#17140F; --panel2:#1F1A13; --line:#2C2519;
+    --gold:#E8B339; --goldDim:#9A7B2A; --safe:#4FB286; --warn:#E8923A;
+    --danger:#D6453D; --text:#EDE6D8; --muted:#8A8073; --faint:#5C554A;
+    --mono:'SF Mono','Consolas',ui-monospace,monospace;
+    --sans:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;
+  }
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  body{margin:0;background:var(--bg);color:var(--text);font-family:var(--sans);padding:22px 14px 60px}
+  .wrap{max-width:720px;margin:0 auto}
+  .ey{font-family:var(--mono);font-size:12px;letter-spacing:.18em;color:var(--goldDim);text-transform:uppercase}
+  h1{font-weight:800;font-size:26px;margin:4px 0 14px}
+  .lbl{font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:6px}
+  .lbl .h{color:var(--faint)}
+  input[type=number]{width:100%;background:var(--bg);border:1px solid var(--line);border-radius:8px;color:var(--text);font-family:var(--mono);font-size:15px;padding:9px 11px;outline:none}
+  input:focus{border-color:var(--gold)}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:16px;margin-bottom:14px}
+  .row{display:flex;gap:12px;flex-wrap:wrap}
+  .col{flex:1 1 140px}
+  .seg{display:flex;gap:8px;margin-bottom:16px}
+  .seg button{flex:1;font-weight:700;font-size:13.5px;padding:11px 8px;border-radius:9px;border:1px solid var(--line);background:transparent;color:var(--muted)}
+  .seg button.on{background:var(--gold);color:var(--bg);border-color:var(--gold)}
+  .chip{font-family:var(--mono);font-size:12px;padding:6px 11px;border-radius:7px;background:transparent;color:var(--muted);border:1px solid var(--line)}
+  .chip.on{background:var(--gold);color:var(--bg);border-color:var(--gold);font-weight:700}
+  .chips{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+  .btn{width:100%;font-weight:800;font-size:15px;padding:13px;border-radius:9px;background:var(--gold);color:var(--bg);border:none;margin-top:16px}
+  .stats{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:14px}
+  .stat{flex:1 1 150px;background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:12px 14px}
+  .stat .k{font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:5px}
+  .stat .v{font-family:var(--mono);font-size:22px;font-weight:800;line-height:1.05}
+  .stat .s{color:var(--faint);font-size:11px;margin-top:3px}
+  .thead,.trow{display:grid;grid-template-columns:42px 1fr 1fr 80px;gap:8px;align-items:center}
+  .thead{padding:6px 8px;font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+  .thead .r{text-align:right}
+  .trow{padding:4px 8px;border-top:1px solid var(--line)}
+  .trow .n{font-family:var(--mono);font-size:13px;color:var(--faint)}
+  .trow .n.on{color:var(--gold)}
+  .trow input{font-size:14px;padding:7px 9px;border-radius:7px}
+  .trow .cum{font-family:var(--mono);font-size:13px;text-align:right;color:var(--faint)}
+  .trow .cum.on{color:var(--text)}
+  .scroll{max-height:330px;overflow-y:auto}
+  .needrow{display:flex;flex-wrap:wrap}
+  .need{flex:1 1 110px;padding:6px 14px}
+  .need+.need{border-left:1px solid var(--line)}
+  .need .p{color:var(--faint);font-size:12px;font-family:var(--mono)}
+  .need .a{font-family:var(--mono);font-size:21px;font-weight:700;color:var(--safe)}
+  .need .x{color:var(--faint);font-size:11px}
+  .fine{color:var(--faint);font-size:12px;line-height:1.5;margin:10px 4px 0}
+  canvas{width:100%;height:230px;display:block}
+  .hide{display:none}
+  .small{font-family:var(--mono);font-size:12px;color:var(--faint)}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="ey">XAUUSD · Grid Two-Way</div>
+  <h1>Investment &#8596; Lot &amp; Gap</h1>
+  <div class="seg">
+    <button id="mA" class="on" onclick="setMode('req')">A &#183; Investment nikalo</button>
+    <button id="mB" onclick="setMode('auto')">B &#183; Auto design</button>
+  </div>
+  <div id="paneA" class="card">
+    <div class="lbl">Tum bharo <span class="h">&#183; lot + gap niche table</span></div>
+    <div style="max-width:240px">
+      <div class="lbl">Market movement <span class="h">&#183; $</span></div>
+      <input id="moveA" type="number" value="100" step="10" />
+    </div>
+    <p class="fine">Niche 30 rows mein apne EA ke lot &amp; gap daalo. Tool batayega is move ke liye kitna investment chahiye aur DD amount kya hoga.</p>
+  </div>
+  <div id="paneB" class="card hide">
+    <div class="lbl">Tum bharo &#8594; tool design karega</div>
+    <div class="row">
+      <div class="col"><div class="lbl">Investment <span class="h">&#183; USD</span></div><input id="capital" type="number" value="1000" step="50" /></div>
+      <div class="col"><div class="lbl">Market movement <span class="h">&#183; $</span></div><input id="moveB" type="number" value="100" step="10" /></div>
+      <div style="flex:1 1 90px"><div class="lbl">Levels</div><input id="count" type="number" value="30" step="1" /></div>
+    </div>
+    <div style="margin-top:14px;display:flex;gap:18px;flex-wrap:wrap">
+      <div><div class="lbl">Risk (DD)</div><div class="chips" id="riskChips">
+        <span class="chip" data-v="50">50%</span><span class="chip on" data-v="70">70%</span><span class="chip" data-v="90">90%</span></div></div>
+      <div><div class="lbl">Lot style</div><div class="chips">
+        <span class="chip on" id="lsFlat" onclick="setLot('flat')">Flat</span>
+        <span class="chip" id="lsLad" onclick="setLot('ladder')">Ladder</span>
+        <input id="step" type="number" value="0.01" step="0.01" style="width:66px" class="hide" /></div></div>
+    </div>
+    <button class="btn" onclick="runAuto()">Design 30-level lot &amp; gap &#8594;</button>
+    <p id="heavy" class="fine hide" style="color:var(--danger)">Min lot 0.01 pe bhi ye config budget se bhaari hai &#8212; levels kam karo, move chhota karo, ya investment badhao.</p>
+  </div>
+  <div id="outA">
+    <div class="stats">
+      <div class="stat"><div class="k" id="aK1">Drawdown</div><div class="v" id="aV1" style="color:var(--gold)">&#8212;</div><div class="s" id="aS1"></div></div>
+      <div class="stat"><div class="k">Bare-min investment</div><div class="v" id="aV2" style="color:var(--danger)">&#8212;</div><div class="s">equity zero (100% DD)</div></div>
+      <div class="stat"><div class="k">Grid span</div><div class="v" id="aV3" style="color:var(--text)">&#8212;</div><div class="s">full deploy move</div></div>
+    </div>
+    <div class="card"><div class="lbl" id="needLbl">Investment needed per DD target</div><div class="needrow" id="needRow"></div></div>
+  </div>
+  <div id="outB" class="hide">
+    <div class="stats">
+      <div class="stat"><div class="k">Drawdown @ move</div><div class="v" id="bV1">&#8212;</div><div class="s" id="bS1"></div></div>
+      <div class="stat"><div class="k">Designed gap</div><div class="v" id="bV2" style="color:var(--gold)">&#8212;</div><div class="s">uniform</div></div>
+      <div class="stat"><div class="k">Total lot</div><div class="v" id="bV3" style="color:var(--text)">&#8212;</div><div class="s">full basket</div></div>
+      <div class="stat"><div class="k">Hard blow-up</div><div class="v" id="bV4" style="color:var(--danger)">&#8212;</div><div class="s">equity zero</div></div>
+    </div>
+  </div>
+  <div class="card" style="padding:8px 8px 10px">
+    <div class="thead"><div>Lvl</div><div>Lot</div><div>Gap $</div><div class="r">Cum $</div></div>
+    <div class="scroll" id="tbody"></div>
+    <div class="small" style="padding:10px 8px 2px" id="tfoot"></div>
+  </div>
+  <div class="card" style="padding:14px 10px 6px">
+    <div class="lbl" id="chartLbl">Floating loss vs adverse move</div>
+    <canvas id="chart" width="700" height="230"></canvas>
+  </div>
+  <p class="fine">DD = floating loss jab levels open ho. Investment "needed" = woh capital jisme is move pe loss = us DD%. Slippage/spread/swap shaamil nahi. Educational tool.</p>
+</div><script>
+var mode='req', risk=70, lotStyle='flat';
+var levels=[];
+for(var k=0;k<30;k++) levels.push({lot:0.01, gap: k===0?0:5});
+
+function num(x){var v=parseFloat(x); return isFinite(v)?v:0;}
+function r2(x){return Math.round(x*100)/100;}
+function floorLot(x){return Math.floor(x/0.01)*0.01;}
+function fmt(n,d){d=d||0; if(!isFinite(n))return '\u221e';
+  return n.toLocaleString('en-US',{minimumFractionDigits:d,maximumFractionDigits:d});}
+function cumDist(L){var out=[],acc=0;for(var i=0;i<L.length;i++){acc+=num(L[i].gap);out.push(r2(acc));}return out;}
+function lossAtMove(M,L,cum){if(M<=0)return{loss:0,open:0};var loss=0,open=0;
+  for(var i=0;i<L.length;i++){var lot=num(L[i].lot);if(lot<=0)continue;
+    if(cum[i]<=M){loss+=lot*100*(M-cum[i]);open++;}}return{loss:loss,open:open};}
+
+function autoDesign(capital,move,ddFrac,N,style,step){
+  N=Math.max(2,Math.min(60,Math.round(N)));
+  var M=move>0?move:1, g=M/(N-1), budget=capital*ddFrac;
+  var denomFlat=0,denomStep=0;
+  for(var k=0;k<N;k++){var w=100*g*(N-1-k);denomFlat+=w;denomStep+=w*k;}
+  var lots=[],heavy=false;
+  if(style==='ladder'){
+    var L0=denomFlat>0?(budget-step*denomStep)/denomFlat:0; L0=floorLot(L0);
+    if(L0<0.01){L0=0.01;heavy=true;}
+    for(var k2=0;k2<N;k2++) lots.push(r2(Math.max(0.01,L0+step*k2)));
+  }else{
+    var L=denomFlat>0?budget/denomFlat:0; L=floorLot(L);
+    if(L<0.01){L=0.01;heavy=true;}
+    for(var k3=0;k3<N;k3++) lots.push(r2(L));
+  }
+  var out=[];for(var k4=0;k4<N;k4++) out.push({lot:lots[k4], gap:k4===0?0:r2(g)});
+  return {levels:out, gap:r2(g), heavy:heavy};
+}
+
+function buildTable(){
+  var tb=document.getElementById('tbody'); tb.innerHTML='';
+  for(var i=0;i<levels.length;i++){(function(i){
+    var row=document.createElement('div'); row.className='trow';
+    var n=document.createElement('div'); n.className='n'; n.id='n'+i; n.textContent=i+1;
+    var c1=document.createElement('div');
+    var li=document.createElement('input'); li.type='number'; li.step='0.01'; li.value=levels[i].lot;
+    li.oninput=function(){levels[i].lot=num(li.value);recalc();}; c1.appendChild(li);
+    var c2=document.createElement('div');
+    var gi=document.createElement('input'); gi.type='number'; gi.step='0.5'; gi.value=levels[i].gap;
+    gi.oninput=function(){levels[i].gap=num(gi.value);recalc();}; c2.appendChild(gi);
+    var cu=document.createElement('div'); cu.className='cum'; cu.id='cum'+i;
+    row.appendChild(n);row.appendChild(c1);row.appendChild(c2);row.appendChild(cu);
+    tb.appendChild(row);
+  })(i);}
+}
+
+function recalc(){
+  var M = mode==='req'? num(document.getElementById('moveA').value) : num(document.getElementById('moveB').value);
+  var cap = num(document.getElementById('capital').value);
+  var cum=cumDist(levels);
+  var span=cum.length?cum[cum.length-1]:0;
+  var totalLot=levels.reduce(function(a,l){return a+num(l.lot);},0);
+  var atMove=lossAtMove(M,levels,cum);
+  var gap0=levels.length>1?num(levels[1].gap):0;
+  for(var i=0;i<levels.length;i++){
+    var on=cum[i]<=M && num(levels[i].lot)>0;
+    var cu=document.getElementById('cum'+i); if(cu){cu.textContent='$'+fmt(cum[i]); cu.className='cum'+(on?' on':'');}
+    var nn=document.getElementById('n'+i); if(nn){nn.className='n'+(on?' on':'');}
+  }
+  if(mode==='req'){
+    document.getElementById('aK1').textContent='Drawdown @ $'+fmt(M)+' move';
+    document.getElementById('aV1').textContent='$'+fmt(atMove.loss);
+    document.getElementById('aS1').textContent=atMove.open+' levels open';
+    document.getElementById('aV2').textContent='$'+fmt(atMove.loss);
+    document.getElementById('aV3').textContent='$'+fmt(span);
+    document.getElementById('needLbl').innerHTML='Investment needed per DD target <span class="h">&#183; is $'+fmt(M)+' move ke liye</span>';
+    var nr=document.getElementById('needRow'); nr.innerHTML='';
+    [50,70,90].forEach(function(p){
+      var d=document.createElement('div'); d.className='need';
+      d.innerHTML='<div class="p">'+p+'% DD</div><div class="a">$'+fmt(atMove.loss/(p/100))+'</div><div class="x">itni capital pe '+p+'% gir jaata</div>';
+      nr.appendChild(d);});
+    drawChart('loss', M, cap, cum, span);
+  } else {
+    var ddPct=cap>0?(atMove.loss/cap)*100:0;
+    var blow=null;
+    for(var m=0.5;m<=8000;m+=0.5){var Lz=lossAtMove(m,levels,cum); if(Lz.loss>=cap){blow=m;break;}}
+    var v1=document.getElementById('bV1'); v1.textContent='$'+fmt(atMove.loss);
+    v1.style.color = ddPct>90?'var(--danger)':ddPct>70?'var(--warn)':'var(--safe)';
+    document.getElementById('bS1').textContent=fmt(ddPct)+'% of capital';
+    document.getElementById('bV2').textContent='$'+fmt(gap0,2);
+    document.getElementById('bV3').textContent=fmt(totalLot,2);
+    document.getElementById('bV4').textContent=blow?'$'+fmt(blow):'\u221e';
+    drawChart('eq', M, cap, cum, span, blow);
+  }
+  document.getElementById('tfoot').textContent = mode==='req'
+    ? 'Apne lot & gap daalo \u2014 upar required investment update hoga.'
+    : 'Design ke baad bhi editable \u2014 koi value badlo toh live recalc.';
+}
+
+function drawChart(kind, M, cap, cum, span, blow){
+  var cv=document.getElementById('chart'); var ctx=cv.getContext('2d');
+  var W=cv.width, H=cv.height, padL=58, padB=24, padT=10, padR=12;
+  ctx.clearRect(0,0,W,H);
+  var ceil=Math.max(M*1.4, span*1.2, 50), N=120, xs=[],ys=[],maxY=0;
+  for(var i=0;i<=N;i++){var m=ceil*i/N; var loss=lossAtMove(m,levels,cum).loss;
+    var y = kind==='loss'? loss : Math.max(0,cap-loss); xs.push(m); ys.push(y); if(y>maxY)maxY=y;}
+  if(maxY<=0)maxY=1;
+  function X(m){return padL+(W-padL-padR)*(m/ceil);}
+  function Y(v){return padT+(H-padT-padB)*(1-v/maxY);}
+  ctx.strokeStyle='#2C2519'; ctx.lineWidth=1; ctx.font="10px monospace"; ctx.fillStyle='#8A8073';
+  for(var g=0;g<=4;g++){var yy=padT+(H-padT-padB)*g/4; ctx.beginPath();ctx.setLineDash([2,4]);
+    ctx.moveTo(padL,yy);ctx.lineTo(W-padR,yy);ctx.stroke();ctx.setLineDash([]);
+    ctx.fillText('$'+fmt(maxY*(1-g/4)),4,yy+3);}
+  for(var gx=0;gx<=4;gx++){var mm=ceil*gx/4; ctx.fillText('$'+fmt(mm),X(mm)-10,H-8);}
+  var col = kind==='loss'? '#D6453D':'#E8B339';
+  var grad=ctx.createLinearGradient(0,padT,0,H-padB);
+  grad.addColorStop(0, kind==='loss'?'rgba(214,69,61,.4)':'rgba(232,179,57,.4)');
+  grad.addColorStop(1,'rgba(214,69,61,.04)');
+  ctx.beginPath(); ctx.moveTo(X(0),Y(ys[0]));
+  for(var p=1;p<=N;p++) ctx.lineTo(X(xs[p]),Y(ys[p]));
+  ctx.lineTo(X(ceil),H-padB); ctx.lineTo(X(0),H-padB); ctx.closePath(); ctx.fillStyle=grad; ctx.fill();
+  ctx.beginPath(); ctx.moveTo(X(0),Y(ys[0]));
+  for(var q=1;q<=N;q++) ctx.lineTo(X(xs[q]),Y(ys[q]));
+  ctx.strokeStyle=col; ctx.lineWidth=2; ctx.stroke();
+  ctx.strokeStyle='#8A8073'; ctx.setLineDash([2,3]); ctx.beginPath();
+  ctx.moveTo(X(M),padT); ctx.lineTo(X(M),H-padB); ctx.stroke(); ctx.setLineDash([]);
+  ctx.fillStyle='#8A8073'; ctx.fillText('YOUR MOVE',X(M)+3,padT+10);
+  if(kind==='eq' && blow && blow<=ceil){
+    ctx.strokeStyle='#D6453D'; ctx.setLineDash([4,3]); ctx.beginPath();
+    ctx.moveTo(X(blow),padT); ctx.lineTo(X(blow),H-padB); ctx.stroke(); ctx.setLineDash([]);
+    ctx.fillStyle='#D6453D'; ctx.fillText('LIQUIDATION',X(blow)-70,padT+10);}
+}
+
+function setMode(m){
+  mode=m;
+  document.getElementById('mA').className = m==='req'?'on':'';
+  document.getElementById('mB').className = m==='auto'?'on':'';
+  document.getElementById('paneA').className = m==='req'?'card':'card hide';
+  document.getElementById('paneB').className = m==='auto'?'card':'card hide';
+  document.getElementById('outA').className = m==='req'?'':'hide';
+  document.getElementById('outB').className = m==='auto'?'':'hide';
+  document.getElementById('chartLbl').textContent = m==='req'?'Floating loss vs adverse move':'Equity remaining vs adverse move';
+  recalc();
+}
+function setLot(s){
+  lotStyle=s;
+  document.getElementById('lsFlat').className = s==='flat'?'chip on':'chip';
+  document.getElementById('lsLad').className = s==='ladder'?'chip on':'chip';
+  document.getElementById('step').className = s==='ladder'?'':'hide';
+}
+document.getElementById('riskChips').addEventListener('click',function(e){
+  if(e.target.dataset.v){risk=num(e.target.dataset.v);
+    [].forEach.call(this.children,function(c){c.className=(c===e.target)?'chip on':'chip';});}
+});
+function runAuto(){
+  var r=autoDesign(num(document.getElementById('capital').value),
+    num(document.getElementById('moveB').value), risk/100,
+    num(document.getElementById('count').value), lotStyle, num(document.getElementById('step').value));
+  levels=r.levels;
+  document.getElementById('heavy').className = r.heavy?'fine':'fine hide';
+  buildTable(); recalc();
+}
+['moveA','moveB','capital'].forEach(function(id){
+  document.getElementById(id).addEventListener('input',recalc);});
+buildTable(); recalc();
+</script>
+</body>
+</html>
